@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>Basketball Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>Basketball Training Tracker</h1>
+        <p>Track my basketball progress.</p>
+    </header>
+
+
+       <h2>My Stats</h2>
+
+        <div class="stats">
+
+        <div class="stat-card">
+        <h3>Points</h3>
+        <p class="stat-number" id="points-stat">0</p>
+        <input type="number" id="points-input" min="0" placeholder="Enter points">
+        </div>
+
+        <div class="stat-card">
+    <h3>Free Throws</h3>
+
+    <p class="stat-number" id="free-throws-stat">0 / 0</p>
+<p id="free-throws-percentage">0.0%</p>
+
+    <input
+        type="number"
+        id="free-throws-made-input"
+        min="0"
+        placeholder="Made"
+    >
+
+    <input
+        type="number"
+        id="free-throws-attempts-input"
+        min="0"
+        placeholder="Attempts"
+    >
+</div>
+
+        <div class="stat-card">
+    <h3>Three Pointers</h3>
+
+    <p class="stat-number" id="three-pointers-stat">0 / 0</p>
+<p id="three-pointers-percentage">0.0%</p>
+
+    <input
+        type="number"
+        id="three-pointers-made-input"
+        min="0"
+        placeholder="Made"
+    >
+
+    <input
+        type="number"
+        id="three-pointers-attempts-input"
+        min="0"
+        placeholder="Attempts"
+    >
+</div>
+
+        <div class="stat-card">
+        <h3>Rebounds</h3>
+        <p class="stat-number" id="rebounds-stat">0</p>
+        <input type="number" id="rebounds-input" min="0" placeholder="Enter rebounds">
+        </div>
+
+        <div class="stat-card">
+        <h3>Assists</h3>
+        <p class="stat-number" id="assists-stat">0</p>
+        <input type="number" id="assists-input" min="0" placeholder="Enter assists">
+        </div>
+
+        </div>
+
+        <button id="save-stats-button">Save Stats</button>
+
+
+      <section class="training">
+
+        <h2>Today's Training</h2>
+
+        <div class="add-training">
+            <input
+                type="text"
+                id="training-input"
+                placeholder="Enter a training exercise"
+            >
+
+            <button id="add-button">Add</button>
+        </div>
+
+        <p id="progress">0 / 4 completed</p>
+
+        <div class="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+
+
+        <label>
+            <input type="checkbox" id="task1">
+            50 right-hand finishes
+        </label>
+
+        <label>
+            <input type="checkbox" id="task2">
+            50 left-hand finishes
+        </label>
+
+        <label>
+            <input type="checkbox" id="task3">
+            100 mid-range shots
+        </label>
+
+        <label>
+            <input type="checkbox" id="task4">
+            30 free throws
+        </label>
+
+
+        <div id="custom-training"></div>
+
+    </section>
+
+
+    <section class="shooting">
+
+        <h2>Shooting Stats</h2>
+
+        <div class="shooting-input">
+
+            <label>
+                Makes
+                <input type="number" id="makes" min="0">
+            </label>
+
+            <label>
+                Attempts
+                <input type="number" id="attempts" min="0">
+            </label>
+
+            <button id="calculate-button">
+                Calculate
+            </button>
+
+        </div>
+
+        <p id="shooting-result">
+            Shooting percentage: --%
+        </p>
+
+    </section>
+
+    <section class="game-history">
+
+    <h2>Game History</h2>
+
+    <div class="game-form">
+
+        <input
+            type="text"
+            id="opponent-input"
+            placeholder="Opponent"
+        >
+
+        <input
+            type="date"
+            id="game-date-input"
+        >
+
+        <input
+            type="number"
+            id="game-points-input"
+            min="0"
+            placeholder="Points"
+        >
+
+        <input
+            type="number"
+            id="game-ft-made-input"
+            min="0"
+            placeholder="FT Made"
+        >
+
+        <input
+            type="number"
+            id="game-ft-attempts-input"
+            min="0"
+            placeholder="FT Attempts"
+        >
+
+        <input
+            type="number"
+            id="game-3pt-made-input"
+            min="0"
+            placeholder="3PT Made"
+        >
+
+        <input
+            type="number"
+            id="game-3pt-attempts-input"
+            min="0"
+            placeholder="3PT Attempts"
+        >
+
+        <input
+            type="number"
+            id="game-rebounds-input"
+            min="0"
+            placeholder="Rebounds"
+        >
+
+        <input
+            type="number"
+            id="game-assists-input"
+            min="0"
+            placeholder="Assists"
+        >
+
+        <button id="save-game-button">
+            Save Game
+        </button>
+
+    </div>
+
+    <div id="game-history-list"></div>
+
+</section>
+
+<section class="game-averages">
+
+    <h2>Game Averages</h2>
+
+    <div class="average-stats">
+
+        <div class="average-card">
+            <h3>Games</h3>
+            <p id="games-played">0</p>
+        </div>
+
+        <div class="average-card">
+            <h3>PPG</h3>
+            <p id="ppg-average">0.0</p>
+        </div>
+
+        <div class="average-card">
+            <h3>RPG</h3>
+            <p id="rpg-average">0.0</p>
+        </div>
+
+        <div class="average-card">
+            <h3>APG</h3>
+            <p id="apg-average">0.0</p>
+        </div>
+
+        <div class="average-card">
+            <h3>FT%</h3>
+            <p id="ft-average">0.0%</p>
+        </div>
+
+        <div class="average-card">
+            <h3>3PT%</h3>
+            <p id="three-average">0.0%</p>
+        </div>
+
+    </div>
+
+</section>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
