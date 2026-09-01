@@ -1,471 +1,654 @@
-const trainingInput = document.querySelector('#training-input');
-const addButton = document.querySelector('#add-button');
-const customTraining = document.querySelector('#custom-training');
+/* =========================
+   PAGE NAVIGATION
+========================= */
 
-const progress = document.querySelector('#progress');
-const progressBar = document.querySelector('#progress-bar');
+const pages = document.querySelectorAll(".page");
+const navButtons = document.querySelectorAll(".nav-button");
+const pageButtons = document.querySelectorAll("[data-page]");
+
+function showPage(pageName) {
+
+    pages.forEach(function(page) {
+
+        page.classList.remove("active-page");
+
+    });
+
+    const selectedPage =
+        document.querySelector("#" + pageName + "-page");
+
+    if (selectedPage) {
+
+        selectedPage.classList.add("active-page");
+
+    }
 
 
-// ===============================
-// TRAINING PROGRESS
-// ===============================
+    navButtons.forEach(function(button) {
+
+        button.classList.remove("active");
+
+        if (button.dataset.page === pageName) {
+
+            button.classList.add("active");
+
+        }
+
+    });
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+
+/* Navigation buttons */
+
+pageButtons.forEach(function(button) {
+
+    button.addEventListener("click", function() {
+
+        const pageName = button.dataset.page;
+
+        showPage(pageName);
+
+    });
+
+});
+
+
+/* =========================
+   TRAINING
+========================= */
+
+const trainingInput =
+    document.querySelector("#training-input");
+
+const addButton =
+    document.querySelector("#add-button");
+
+const customTraining =
+    document.querySelector("#custom-training");
+
+const progress =
+    document.querySelector("#progress");
+
+const progressBar =
+    document.querySelector("#progress-bar");
+
 
 function updateProgress() {
 
-    const checkboxes = document.querySelectorAll(
-        '.training input[type="checkbox"]'
-    );
+    const checkboxes =
+        document.querySelectorAll(
+            '.training input[type="checkbox"]'
+        );
 
     let completed = 0;
 
     checkboxes.forEach(function(box) {
 
         if (box.checked) {
+
             completed++;
+
         }
 
     });
 
+
     progress.textContent =
-        completed + " / " + checkboxes.length + " completed";
+        completed +
+        " / " +
+        checkboxes.length +
+        " completed";
 
-    const percentage =
-        checkboxes.length === 0
-            ? 0
-            : (completed / checkboxes.length) * 100;
 
-    progressBar.style.width = percentage + "%";
+    let percentage = 0;
+
+    if (checkboxes.length > 0) {
+
+        percentage =
+            (completed / checkboxes.length) * 100;
+
+    }
+
+
+    progressBar.style.width =
+        percentage + "%";
+
 }
 
 
-// ===============================
-// CUSTOM EXERCISES
-// ===============================
+/* Get custom exercises */
 
 function getCustomExercises() {
 
-    const saved = localStorage.getItem("customExercises");
+    const saved =
+        localStorage.getItem("customExercises");
 
     if (saved === null) {
+
         return [];
+
     }
 
     return JSON.parse(saved);
+
 }
 
 
+/* Original exercises */
+
 function setupOriginalCheckbox(checkbox) {
 
-    checkbox.addEventListener('change', function() {
+    checkbox.addEventListener(
+        "change",
+        function() {
 
-        localStorage.setItem(
-            "original-" + checkbox.id,
-            checkbox.checked
-        );
+            localStorage.setItem(
+                "original-" + checkbox.id,
+                checkbox.checked
+            );
 
-        updateProgress();
+            updateProgress();
 
-    });
+        }
+    );
 
 }
 
 
 function loadOriginalExercises() {
 
-    const originalCheckboxes = document.querySelectorAll(
-        '.training input[type="checkbox"][id^="task"]'
-    );
-
-    originalCheckboxes.forEach(function(checkbox) {
-
-        const saved = localStorage.getItem(
-            "original-" + checkbox.id
+    const originalCheckboxes =
+        document.querySelectorAll(
+            '.training input[type="checkbox"][id^="task"]'
         );
 
-        if (saved === "true") {
-            checkbox.checked = true;
+
+    originalCheckboxes.forEach(
+        function(checkbox) {
+
+            const saved =
+                localStorage.getItem(
+                    "original-" + checkbox.id
+                );
+
+
+            if (saved === "true") {
+
+                checkbox.checked = true;
+
+            }
+
+
+            setupOriginalCheckbox(checkbox);
+
         }
-
-        setupOriginalCheckbox(checkbox);
-
-    });
+    );
 
 }
 
+
+/* Custom exercises */
 
 function renderCustomExercises() {
 
     customTraining.innerHTML = "";
 
-    const customExercises = getCustomExercises();
-
-    customExercises.forEach(function(exercise, index) {
-
-        const label = document.createElement('label');
-
-        const checkbox = document.createElement('input');
-
-        checkbox.type = "checkbox";
-        checkbox.checked = exercise.completed;
+    const customExercises =
+        getCustomExercises();
 
 
-        const deleteButton = document.createElement('button');
+    customExercises.forEach(
+        function(exercise, index) {
 
-        deleteButton.textContent = "Delete";
-        deleteButton.type = "button";
-
-
-        label.appendChild(checkbox);
-        label.append(" " + exercise.name);
-        label.appendChild(deleteButton);
-
-        customTraining.appendChild(label);
+            const label =
+                document.createElement("label");
 
 
-        checkbox.addEventListener('change', function() {
+            const checkbox =
+                document.createElement("input");
 
-            customExercises[index].completed =
-                checkbox.checked;
+            checkbox.type = "checkbox";
 
-            localStorage.setItem(
-                "customExercises",
-                JSON.stringify(customExercises)
+            checkbox.checked =
+                exercise.completed;
+
+
+            const deleteButton =
+                document.createElement("button");
+
+            deleteButton.textContent =
+                "Delete";
+
+            deleteButton.type =
+                "button";
+
+
+            label.appendChild(checkbox);
+
+            label.append(
+                " " + exercise.name
             );
 
-            updateProgress();
-
-        });
-
-
-        deleteButton.addEventListener('click', function() {
-
-            customExercises.splice(index, 1);
-
-            localStorage.setItem(
-                "customExercises",
-                JSON.stringify(customExercises)
+            label.appendChild(
+                deleteButton
             );
 
-            renderCustomExercises();
 
-        });
+            customTraining.appendChild(
+                label
+            );
 
-    });
+
+            checkbox.addEventListener(
+                "change",
+                function() {
+
+                    customExercises[index].completed =
+                        checkbox.checked;
+
+
+                    localStorage.setItem(
+                        "customExercises",
+                        JSON.stringify(customExercises)
+                    );
+
+
+                    updateProgress();
+
+                }
+            );
+
+
+            deleteButton.addEventListener(
+                "click",
+                function() {
+
+                    customExercises.splice(
+                        index,
+                        1
+                    );
+
+
+                    localStorage.setItem(
+                        "customExercises",
+                        JSON.stringify(customExercises)
+                    );
+
+
+                    renderCustomExercises();
+
+                }
+            );
+
+        }
+    );
+
 
     updateProgress();
 
 }
 
 
-addButton.addEventListener('click', function() {
+/* Add exercise */
 
-    const exercise = trainingInput.value.trim();
+addButton.addEventListener(
+    "click",
+    function() {
 
-    if (exercise === "") {
-        return;
+        const exercise =
+            trainingInput.value.trim();
+
+
+        if (exercise === "") {
+
+            return;
+
+        }
+
+
+        const customExercises =
+            getCustomExercises();
+
+
+        customExercises.push({
+
+            name: exercise,
+
+            completed: false
+
+        });
+
+
+        localStorage.setItem(
+            "customExercises",
+            JSON.stringify(customExercises)
+        );
+
+
+        trainingInput.value = "";
+
+        renderCustomExercises();
+
     }
-
-    const customExercises = getCustomExercises();
-
-    customExercises.push({
-
-        name: exercise,
-
-        completed: false
-
-    });
-
-    localStorage.setItem(
-        "customExercises",
-        JSON.stringify(customExercises)
-    );
-
-    trainingInput.value = "";
-
-    renderCustomExercises();
-
-});
+);
 
 
-trainingInput.addEventListener('keydown', function(event) {
+/* Enter key */
 
-    if (event.key === "Enter") {
+trainingInput.addEventListener(
+    "keydown",
+    function(event) {
 
-        addButton.click();
+        if (event.key === "Enter") {
+
+            addButton.click();
+
+        }
 
     }
-
-});
-
-
-// ===============================
-// SHOOTING CALCULATOR
-// ===============================
-
-const makesInput = document.querySelector('#makes');
-const attemptsInput = document.querySelector('#attempts');
-const calculateButton = document.querySelector('#calculate-button');
-const shootingResult = document.querySelector('#shooting-result');
+);
 
 
-calculateButton.addEventListener('click', function() {
+/* =========================
+   SHOOTING CALCULATOR
+========================= */
 
-    const makes = Number(makesInput.value);
-    const attempts = Number(attemptsInput.value);
+const makesInput =
+    document.querySelector("#makes");
 
-    if (attempts <= 0) {
+const attemptsInput =
+    document.querySelector("#attempts");
+
+const calculateButton =
+    document.querySelector("#calculate-button");
+
+const shootingResult =
+    document.querySelector("#shooting-result");
+
+
+calculateButton.addEventListener(
+    "click",
+    function() {
+
+        const makes =
+            Number(makesInput.value);
+
+        const attempts =
+            Number(attemptsInput.value);
+
+
+        if (attempts <= 0) {
+
+            shootingResult.textContent =
+                "Please enter a valid number of attempts.";
+
+            return;
+
+        }
+
+
+        if (makes < 0 || makes > attempts) {
+
+            shootingResult.textContent =
+                "Makes cannot be greater than attempts.";
+
+            return;
+
+        }
+
+
+        const percentage =
+            (makes / attempts) * 100;
+
 
         shootingResult.textContent =
-            "I may be dumb but please enter a valid number of attempts.";
+            "Shooting percentage: " +
+            percentage.toFixed(1) +
+            "%";
 
-        return;
     }
-
-    if (makes < 0 || makes > attempts) {
-
-        shootingResult.textContent =
-            "I may be dumb but makes cannot be greater than attempts.";
-
-        return;
-    }
-
-    const percentage = (makes / attempts) * 100;
-
-    shootingResult.textContent =
-        "Shooting percentage: " +
-        percentage.toFixed(1) +
-        "%";
-
-});
+);
 
 
-// ===============================
-// MY STATS
-// ===============================
+/* =========================
+   MY STATS
+========================= */
 
 const saveStatsButton =
-    document.querySelector('#save-stats-button');
+    document.querySelector("#save-stats-button");
+
 
 const pointsInput =
-    document.querySelector('#points-input');
+    document.querySelector("#points-input");
 
 const freeThrowsMadeInput =
-    document.querySelector('#free-throws-made-input');
+    document.querySelector(
+        "#free-throws-made-input"
+    );
 
 const freeThrowsAttemptsInput =
-    document.querySelector('#free-throws-attempts-input');
+    document.querySelector(
+        "#free-throws-attempts-input"
+    );
 
 const threePointersMadeInput =
-    document.querySelector('#three-pointers-made-input');
+    document.querySelector(
+        "#three-pointers-made-input"
+    );
 
 const threePointersAttemptsInput =
-    document.querySelector('#three-pointers-attempts-input');
+    document.querySelector(
+        "#three-pointers-attempts-input"
+    );
 
 const reboundsInput =
-    document.querySelector('#rebounds-input');
+    document.querySelector("#rebounds-input");
 
 const assistsInput =
-    document.querySelector('#assists-input');
+    document.querySelector("#assists-input");
 
 
-// Save stats
+saveStatsButton.addEventListener(
+    "click",
+    function() {
 
-saveStatsButton.addEventListener('click', function() {
+        const points =
+            Number(pointsInput.value) || 0;
 
-    const points = Number(pointsInput.value);
+        const ftMade =
+            Number(freeThrowsMadeInput.value) || 0;
 
-    const freeThrowsMade =
-        Number(freeThrowsMadeInput.value);
+        const ftAttempts =
+            Number(freeThrowsAttemptsInput.value) || 0;
 
-    const freeThrowsAttempts =
-        Number(freeThrowsAttemptsInput.value);
+        const threeMade =
+            Number(threePointersMadeInput.value) || 0;
 
-    const threePointersMade =
-        Number(threePointersMadeInput.value);
+        const threeAttempts =
+            Number(threePointersAttemptsInput.value) || 0;
 
-    const threePointersAttempts =
-        Number(threePointersAttemptsInput.value);
+        const rebounds =
+            Number(reboundsInput.value) || 0;
 
-    const rebounds =
-        Number(reboundsInput.value);
-
-    const assists =
-        Number(assistsInput.value);
+        const assists =
+            Number(assistsInput.value) || 0;
 
 
-    // Validation
+        document.querySelector(
+            "#points-stat"
+        ).textContent = points;
 
-    if (freeThrowsMade > freeThrowsAttempts) {
 
-        alert(
-            "Free throws made cannot be greater than attempts."
+        document.querySelector(
+            "#free-throws-stat"
+        ).textContent =
+            ftMade + " / " + ftAttempts;
+
+
+        document.querySelector(
+            "#three-pointers-stat"
+        ).textContent =
+            threeMade + " / " + threeAttempts;
+
+
+        document.querySelector(
+            "#rebounds-stat"
+        ).textContent = rebounds;
+
+
+        document.querySelector(
+            "#assists-stat"
+        ).textContent = assists;
+
+
+        let ftPercentage = 0;
+
+        if (ftAttempts > 0) {
+
+            ftPercentage =
+                (ftMade / ftAttempts) * 100;
+
+        }
+
+
+        let threePercentage = 0;
+
+        if (threeAttempts > 0) {
+
+            threePercentage =
+                (threeMade / threeAttempts) * 100;
+
+        }
+
+
+        document.querySelector(
+            "#free-throws-percentage"
+        ).textContent =
+            ftPercentage.toFixed(1) + "%";
+
+
+        document.querySelector(
+            "#three-pointers-percentage"
+        ).textContent =
+            threePercentage.toFixed(1) + "%";
+
+
+        localStorage.setItem(
+            "points",
+            points
         );
 
-        return;
-    }
-
-
-    if (threePointersMade > threePointersAttempts) {
-
-        alert(
-            "Three pointers made cannot be greater than attempts."
+        localStorage.setItem(
+            "freeThrowsMade",
+            ftMade
         );
 
-        return;
+        localStorage.setItem(
+            "freeThrowsAttempts",
+            ftAttempts
+        );
+
+        localStorage.setItem(
+            "threePointersMade",
+            threeMade
+        );
+
+        localStorage.setItem(
+            "threePointersAttempts",
+            threeAttempts
+        );
+
+        localStorage.setItem(
+            "rebounds",
+            rebounds
+        );
+
+        localStorage.setItem(
+            "assists",
+            assists
+        );
+
+
+        updateDashboard();
+
     }
+);
 
 
-    // Calculate percentages
-
-    let freeThrowPercentage = 0;
-
-    if (freeThrowsAttempts > 0) {
-
-        freeThrowPercentage =
-            (freeThrowsMade / freeThrowsAttempts) * 100;
-
-    }
-
-
-    let threePointerPercentage = 0;
-
-    if (threePointersAttempts > 0) {
-
-        threePointerPercentage =
-            (threePointersMade / threePointersAttempts) * 100;
-
-    }
-
-
-    // Update screen
-
-    document.querySelector('#points-stat').textContent =
-        points;
-
-    document.querySelector('#free-throws-stat').textContent =
-        freeThrowsMade + " / " + freeThrowsAttempts;
-
-    document.querySelector('#three-pointers-stat').textContent =
-        threePointersMade + " / " + threePointersAttempts;
-
-    document.querySelector('#rebounds-stat').textContent =
-        rebounds;
-
-    document.querySelector('#assists-stat').textContent =
-        assists;
-
-
-    document.querySelector('#free-throws-percentage').textContent =
-        freeThrowPercentage.toFixed(1) + "%";
-
-    document.querySelector('#three-pointers-percentage').textContent =
-        threePointerPercentage.toFixed(1) + "%";
-
-
-    // Save stats
-
-    localStorage.setItem(
-        'points',
-        points
-    );
-
-    localStorage.setItem(
-        'freeThrowsMade',
-        freeThrowsMade
-    );
-
-    localStorage.setItem(
-        'freeThrowsAttempts',
-        freeThrowsAttempts
-    );
-
-    localStorage.setItem(
-        'threePointersMade',
-        threePointersMade
-    );
-
-    localStorage.setItem(
-        'threePointersAttempts',
-        threePointersAttempts
-    );
-
-    localStorage.setItem(
-        'rebounds',
-        rebounds
-    );
-
-    localStorage.setItem(
-        'assists',
-        assists
-    );
-
-});
-
-
-// ===============================
-// LOAD SAVED STATS
-// ===============================
+/* =========================
+   LOAD STATS
+========================= */
 
 function loadStats() {
 
-    const savedPoints =
-        localStorage.getItem('points');
+    const points =
+        localStorage.getItem("points");
 
-    const savedFreeThrowsMade =
-        localStorage.getItem('freeThrowsMade');
+    const ftMade =
+        localStorage.getItem("freeThrowsMade");
 
-    const savedFreeThrowsAttempts =
-        localStorage.getItem('freeThrowsAttempts');
+    const ftAttempts =
+        localStorage.getItem("freeThrowsAttempts");
 
-    const savedThreePointersMade =
-        localStorage.getItem('threePointersMade');
+    const threeMade =
+        localStorage.getItem("threePointersMade");
 
-    const savedThreePointersAttempts =
-        localStorage.getItem('threePointersAttempts');
+    const threeAttempts =
+        localStorage.getItem(
+            "threePointersAttempts"
+        );
 
-    const savedRebounds =
-        localStorage.getItem('rebounds');
+    const rebounds =
+        localStorage.getItem("rebounds");
 
-    const savedAssists =
-        localStorage.getItem('assists');
+    const assists =
+        localStorage.getItem("assists");
 
 
-    if (savedPoints !== null) {
+    if (points !== null) {
 
-        document.querySelector('#points-stat').textContent =
-            savedPoints;
+        pointsInput.value = points;
 
-        pointsInput.value =
-            savedPoints;
+        document.querySelector(
+            "#points-stat"
+        ).textContent = points;
 
     }
 
 
     if (
-        savedFreeThrowsMade !== null &&
-        savedFreeThrowsAttempts !== null
+        ftMade !== null &&
+        ftAttempts !== null
     ) {
-
-        document.querySelector('#free-throws-stat').textContent =
-            savedFreeThrowsMade +
-            " / " +
-            savedFreeThrowsAttempts;
 
         freeThrowsMadeInput.value =
-            savedFreeThrowsMade;
+            ftMade;
 
         freeThrowsAttemptsInput.value =
-            savedFreeThrowsAttempts;
+            ftAttempts;
+
+
+        document.querySelector(
+            "#free-throws-stat"
+        ).textContent =
+            ftMade + " / " + ftAttempts;
 
 
         const percentage =
-            Number(savedFreeThrowsAttempts) > 0
-                ? (Number(savedFreeThrowsMade) /
-                    Number(savedFreeThrowsAttempts)) * 100
+            ftAttempts > 0
+                ? (ftMade / ftAttempts) * 100
                 : 0;
 
+
         document.querySelector(
-            '#free-throws-percentage'
+            "#free-throws-percentage"
         ).textContent =
             percentage.toFixed(1) + "%";
 
@@ -473,63 +656,246 @@ function loadStats() {
 
 
     if (
-        savedThreePointersMade !== null &&
-        savedThreePointersAttempts !== null
+        threeMade !== null &&
+        threeAttempts !== null
     ) {
 
-        document.querySelector('#three-pointers-stat').textContent =
-            savedThreePointersMade +
-            " / " +
-            savedThreePointersAttempts;
-
         threePointersMadeInput.value =
-            savedThreePointersMade;
+            threeMade;
 
         threePointersAttemptsInput.value =
-            savedThreePointersAttempts;
+            threeAttempts;
+
+
+        document.querySelector(
+            "#three-pointers-stat"
+        ).textContent =
+            threeMade +
+            " / " +
+            threeAttempts;
 
 
         const percentage =
-            Number(savedThreePointersAttempts) > 0
-                ? (Number(savedThreePointersMade) /
-                    Number(savedThreePointersAttempts)) * 100
+            threeAttempts > 0
+                ? (threeMade / threeAttempts) * 100
                 : 0;
 
+
         document.querySelector(
-            '#three-pointers-percentage'
+            "#three-pointers-percentage"
         ).textContent =
             percentage.toFixed(1) + "%";
 
     }
 
 
-    if (savedRebounds !== null) {
-
-        document.querySelector('#rebounds-stat').textContent =
-            savedRebounds;
+    if (rebounds !== null) {
 
         reboundsInput.value =
-            savedRebounds;
+            rebounds;
+
+        document.querySelector(
+            "#rebounds-stat"
+        ).textContent =
+            rebounds;
 
     }
 
 
-    if (savedAssists !== null) {
-
-        document.querySelector('#assists-stat').textContent =
-            savedAssists;
+    if (assists !== null) {
 
         assistsInput.value =
-            savedAssists;
+            assists;
+
+        document.querySelector(
+            "#assists-stat"
+        ).textContent =
+            assists;
 
     }
 
 }
 
 
-// ===============================
-// START APP
-// ===============================
+/* =========================
+   DASHBOARD
+========================= */
+
+function updateDashboard() {
+
+    const games =
+        JSON.parse(
+            localStorage.getItem(
+                "gameHistory"
+            ) || "[]"
+        );
+
+
+    const ppg =
+        games.length > 0
+            ? games.reduce(
+                (sum, game) =>
+                    sum + Number(game.points || 0),
+                0
+            ) / games.length
+            : 0;
+
+
+    const rpg =
+        games.length > 0
+            ? games.reduce(
+                (sum, game) =>
+                    sum + Number(game.rebounds || 0),
+                0
+            ) / games.length
+            : 0;
+
+
+    const apg =
+        games.length > 0
+            ? games.reduce(
+                (sum, game) =>
+                    sum + Number(game.assists || 0),
+                0
+            ) / games.length
+            : 0;
+
+
+    let ftMade = 0;
+    let ftAttempts = 0;
+
+    let threeMade = 0;
+    let threeAttempts = 0;
+
+
+    games.forEach(function(game) {
+
+        ftMade += Number(
+            game.ftMade || 0
+        );
+
+        ftAttempts += Number(
+            game.ftAttempts || 0
+        );
+
+
+        threeMade += Number(
+            game.threeMade || 0
+        );
+
+        threeAttempts += Number(
+            game.threeAttempts || 0
+        );
+
+    });
+
+
+    const ftPercentage =
+        ftAttempts > 0
+            ? (ftMade / ftAttempts) * 100
+            : 0;
+
+
+    const threePercentage =
+        threeAttempts > 0
+            ? (threeMade / threeAttempts) * 100
+            : 0;
+
+
+    document.querySelector(
+        "#dashboard-ppg"
+    ).textContent =
+        ppg.toFixed(1);
+
+
+    document.querySelector(
+        "#dashboard-rpg"
+    ).textContent =
+        rpg.toFixed(1);
+
+
+    document.querySelector(
+        "#dashboard-apg"
+    ).textContent =
+        apg.toFixed(1);
+
+
+    document.querySelector(
+        "#dashboard-ft"
+    ).textContent =
+        ftPercentage.toFixed(1) + "%";
+
+
+    document.querySelector(
+        "#dashboard-3pt"
+    ).textContent =
+        threePercentage.toFixed(1) + "%";
+
+
+    document.querySelector(
+        "#dashboard-games"
+    ).textContent =
+        games.length;
+
+
+    const recentGame =
+        document.querySelector(
+            "#dashboard-recent-game"
+        );
+
+
+    if (games.length === 0) {
+
+        recentGame.innerHTML =
+            "<p>No games recorded yet.</p>";
+
+        return;
+
+    }
+
+
+    const game =
+        games[games.length - 1];
+
+
+    recentGame.innerHTML = `
+
+        <div class="game-card">
+
+            <h3>
+                🏀 vs ${game.opponent}
+            </h3>
+
+            <p>
+                📅 ${game.date}
+            </p>
+
+            <p>
+                <strong>
+                    ${game.points} PTS
+                </strong>
+                &nbsp;
+                ${game.rebounds} REB
+                &nbsp;
+                ${game.assists} AST
+            </p>
+
+            <p>
+                ${game.ftMade}/${game.ftAttempts} FT
+                &nbsp;
+                ${game.threeMade}/${game.threeAttempts} 3PT
+            </p>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================
+   START APP
+========================= */
 
 loadOriginalExercises();
 
@@ -537,425 +903,6 @@ renderCustomExercises();
 
 loadStats();
 
-// ===============================
-// GAME HISTORY
-// ===============================
+updateDashboard();
 
-const opponentInput =
-    document.querySelector('#opponent-input');
-
-const gameDateInput =
-    document.querySelector('#game-date-input');
-
-const gamePointsInput =
-    document.querySelector('#game-points-input');
-
-const gameFtMadeInput =
-    document.querySelector('#game-ft-made-input');
-
-const gameFtAttemptsInput =
-    document.querySelector('#game-ft-attempts-input');
-
-const game3ptMadeInput =
-    document.querySelector('#game-3pt-made-input');
-
-const game3ptAttemptsInput =
-    document.querySelector('#game-3pt-attempts-input');
-
-const gameReboundsInput =
-    document.querySelector('#game-rebounds-input');
-
-const gameAssistsInput =
-    document.querySelector('#game-assists-input');
-
-const saveGameButton =
-    document.querySelector('#save-game-button');
-
-const gameHistoryList =
-    document.querySelector('#game-history-list');
-
-
-// Get saved games
-
-function getGames() {
-
-    const saved =
-        localStorage.getItem('gameHistory');
-
-    if (saved === null) {
-        return [];
-    }
-
-    return JSON.parse(saved);
-}
-
-
-// Save a new game
-
-saveGameButton.addEventListener('click', function() {
-
-    const opponent =
-        opponentInput.value.trim();
-
-    const date =
-        gameDateInput.value;
-
-    const points =
-        Number(gamePointsInput.value);
-
-    const ftMade =
-        Number(gameFtMadeInput.value);
-
-    const ftAttempts =
-        Number(gameFtAttemptsInput.value);
-
-    const threeMade =
-        Number(game3ptMadeInput.value);
-
-    const threeAttempts =
-        Number(game3ptAttemptsInput.value);
-
-    const rebounds =
-        Number(gameReboundsInput.value);
-
-    const assists =
-        Number(gameAssistsInput.value);
-
-
-    // Basic validation
-
-    if (opponent === "") {
-
-        alert("Please enter the opponent.");
-
-        return;
-    }
-
-    if (date === "") {
-
-        alert("Please enter the game date.");
-
-        return;
-    }
-
-    if (ftMade > ftAttempts) {
-
-        alert(
-            "Free throws made cannot be greater than attempts."
-        );
-
-        return;
-    }
-
-    if (threeMade > threeAttempts) {
-
-        alert(
-            "Three pointers made cannot be greater than attempts."
-        );
-
-        return;
-    }
-
-
-    // Get existing games
-
-    const games = getGames();
-
-
-    // Create new game
-
-    games.push({
-
-        opponent: opponent,
-
-        date: date,
-
-        points: points,
-
-        ftMade: ftMade,
-
-        ftAttempts: ftAttempts,
-
-        threeMade: threeMade,
-
-        threeAttempts: threeAttempts,
-
-        rebounds: rebounds,
-
-        assists: assists
-
-    });
-
-
-    // Save games
-
-    localStorage.setItem(
-        'gameHistory',
-        JSON.stringify(games)
-    );
-
-
-    // Clear form
-
-    opponentInput.value = "";
-    gameDateInput.value = "";
-    gamePointsInput.value = "";
-    gameFtMadeInput.value = "";
-    gameFtAttemptsInput.value = "";
-    game3ptMadeInput.value = "";
-    game3ptAttemptsInput.value = "";
-    gameReboundsInput.value = "";
-    gameAssistsInput.value = "";
-
-
-    // Display games
-
-    renderGames();
-
-});
-
-// ===============================
-// DISPLAY GAME HISTORY
-// ===============================
-
-function renderGames() {
-
-    gameHistoryList.innerHTML = "";
-
-    const games = getGames();
-
-    if (games.length === 0) {
-
-        gameHistoryList.innerHTML =
-            "<p>No games recorded yet.</p>";
-
-        return;
-    }
-
-
-    // Show newest games first
-
-    games.slice().reverse().forEach(function(game, reversedIndex) {
-
-        const realIndex =
-            games.length - 1 - reversedIndex;
-
-
-        // Main game card
-
-        const gameCard =
-            document.createElement('div');
-
-        gameCard.className = "game-card";
-
-
-        // Title
-
-        const title =
-            document.createElement('h3');
-
-        title.textContent =
-            "🏀 vs " + game.opponent;
-
-        gameCard.appendChild(title);
-
-
-        // Date
-
-        const date =
-            document.createElement('p');
-
-        date.textContent =
-            "📅 " + game.date;
-
-        gameCard.appendChild(date);
-
-
-        // Stats
-
-        const stats =
-            document.createElement('div');
-
-        stats.className = "game-stats";
-
-
-        stats.innerHTML = `
-            <p><strong>${game.points}</strong> PTS</p>
-
-            <p><strong>${game.rebounds}</strong> REB</p>
-
-            <p><strong>${game.assists}</strong> AST</p>
-
-            <p><strong>${game.ftMade}/${game.ftAttempts}</strong> FT</p>
-
-            <p><strong>${game.threeMade}/${game.threeAttempts}</strong> 3PT</p>
-        `;
-
-
-        gameCard.appendChild(stats);
-
-
-        // Delete button
-
-        const deleteButton =
-            document.createElement('button');
-
-        deleteButton.textContent =
-            "Delete";
-
-        deleteButton.type =
-            "button";
-
-        deleteButton.className =
-            "delete-game-button";
-
-
-        deleteButton.addEventListener(
-            'click',
-            function() {
-
-                games.splice(realIndex, 1);
-
-                localStorage.setItem(
-                    'gameHistory',
-                    JSON.stringify(games)
-                );
-
-                renderGames();
-
-            }
-        );
-
-
-        gameCard.appendChild(deleteButton);
-
-
-        // Add card to page
-
-        gameHistoryList.appendChild(gameCard);
-
-    });
-
-}
-
-renderGames();
-
-// ===============================
-// GAME AVERAGES
-// ===============================
-
-function updateGameAverages() {
-
-    const games = getGames();
-
-    const gamesPlayed =
-        games.length;
-
-    document.querySelector('#games-played').textContent =
-        gamesPlayed;
-
-
-    if (gamesPlayed === 0) {
-
-        document.querySelector('#ppg-average').textContent = "0.0";
-        document.querySelector('#rpg-average').textContent = "0.0";
-        document.querySelector('#apg-average').textContent = "0.0";
-        document.querySelector('#ft-average').textContent = "0.0%";
-        document.querySelector('#three-average').textContent = "0.0%";
-
-        return;
-    }
-
-
-    let totalPoints = 0;
-    let totalRebounds = 0;
-    let totalAssists = 0;
-
-    let totalFtMade = 0;
-    let totalFtAttempts = 0;
-
-    let totalThreeMade = 0;
-    let totalThreeAttempts = 0;
-
-
-    games.forEach(function(game) {
-
-        totalPoints += Number(game.points);
-
-        totalRebounds += Number(game.rebounds);
-
-        totalAssists += Number(game.assists);
-
-        totalFtMade += Number(game.ftMade);
-
-        totalFtAttempts += Number(game.ftAttempts);
-
-        totalThreeMade += Number(game.threeMade);
-
-        totalThreeAttempts += Number(game.threeAttempts);
-
-    });
-
-
-    // Per-game averages
-
-    const ppg =
-        totalPoints / gamesPlayed;
-
-    const rpg =
-        totalRebounds / gamesPlayed;
-
-    const apg =
-        totalAssists / gamesPlayed;
-
-
-    // Shooting percentages
-
-    const ftPercentage =
-        totalFtAttempts > 0
-            ? (totalFtMade / totalFtAttempts) * 100
-            : 0;
-
-    const threePercentage =
-        totalThreeAttempts > 0
-            ? (totalThreeMade / totalThreeAttempts) * 100
-            : 0;
-
-
-    // Display
-
-    document.querySelector('#ppg-average').textContent =
-        ppg.toFixed(1);
-
-    document.querySelector('#rpg-average').textContent =
-        rpg.toFixed(1);
-
-    document.querySelector('#apg-average').textContent =
-        apg.toFixed(1);
-
-    document.querySelector('#ft-average').textContent =
-        ftPercentage.toFixed(1) + "%";
-
-    document.querySelector('#three-average').textContent =
-        threePercentage.toFixed(1) + "%";
-
-}
-
-
-// Update averages whenever games are displayed
-
-const originalRenderGames =
-    renderGames;
-
-renderGames = function() {
-
-    originalRenderGames();
-
-    updateGameAverages();
-
-};
-
-
-// Initial calculation
-
-updateGameAverages();
+showPage("home");
