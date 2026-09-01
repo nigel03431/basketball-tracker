@@ -5,5 +5,12 @@
     "display": "standalone",
     "background_color": "#f2f2f2",
     "theme_color": "#111111",
-    "description": "Track basketball training, game statistics and progress."
+    "description": "Track basketball training, game statistics and progress.",
+    "icons": [
+        {
+            "src": "./ChatGPT%20Image%20Sep%201%2C%202026%2C%2002_56_38%20PM.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
 }
